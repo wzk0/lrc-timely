@@ -96,7 +96,7 @@ def find(name,lrc_path,music_path):
 		music=os.listdir(music_path)
 		ls=[]
 		for l in lrc:
-			if name in l:
+			if name==l:
 				ls.append(l)
 		for m in music:
 			mm=m.split('.')[0]

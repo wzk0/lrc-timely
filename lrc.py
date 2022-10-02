@@ -15,9 +15,15 @@ def main(player,lrc_name,lrc_path,music_path):
 		ls=[]
 		for l in lrc:
 			if name in l:
-				ls.append(l)
+				if name==l.split('.')[0]:
+					print('\n\033[1;36m已找到同名的歌词文件!\033[0m')
+					ls.append(l)
+				else:
+					print('\n\033[1;36m未找到同名的歌词文件,但找到可能相关的歌词文件!名称为: \033[1;32m'+str(l)+'\033[0m\033[1;36m 将使用该歌词文件!\033[0m')
+					ls.append(l)
 		for m in music:
-			if name in m:
+			mm=m.split('.')[0]
+			if name==mm:
 				ls.append(m)
 		ls.append(len(ls))
 		return ls
@@ -29,7 +35,7 @@ def main(player,lrc_name,lrc_path,music_path):
 		music=os.listdir(music_path)
 		ls=[]
 		for l in lrc:
-			if name in l:
+			if name==l:
 				ls.append(l)
 		for m in music:
 			mm=m.split('.')[0]
