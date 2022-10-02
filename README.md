@@ -2,6 +2,16 @@
 
 通过sleep实现的终端lrc歌词文件解析和实时展示.
 
+## 功能
+
+1. 秒数级的实时歌词显示;
+
+2. 自动寻词和模糊识别功能;
+
+3. 多情况判断与参数返回;
+
+4. ...
+
 ## 效果
 
 > 使用`sox`播放时:
@@ -46,22 +56,52 @@
 
 参数:
 
-`main(player,lrc_name,music_name)`,
+`main(player,name,lrc_path,music_path)`,
 
 其中:
 
 `player`填写播放器名称(`play `或`cvlc `或其他),**注意:需要在末尾加空格!**
 
-`lrc_name`填写歌词文件的路径,**注意:不需要加后缀名!**
+`name`填写待播放的文件名或文件的部分名,**注意:不需要加后缀名!**
 
-`music_name`填写音频文件的路径,**注意:需要加后缀名!**
+`lrc_path`填写歌词文件所在文件夹的路径,
 
-例如:
+同理,`music_path`是音频文件所在文件夹的路径.
 
-`main('cvlc ','幼稚园杀手-天生爱你','幼稚园杀手-天生爱你.mp3')`
+会根据`name`自动匹配两个文件夹中的歌词和音频;如果连音频都匹配不到,则会返回`False`;
 
-## 可能会添加
+有音频无歌词的情况下,会直接在终端打印`没有找到歌词!`
 
-* 根据歌名自动寻歌词功能(这样只需要一个参数即可);
+## 其他
 
-* ...
+可以在代码第54行的地方修改输出样式,例如`彩虹皮肤`:
+
+![](https://ghproxy.com/https://raw.githubusercontent.com/wzk0/photo/main/202210021556347.png)
+
+将此行修改为:
+
+```python3
+i=random.randint(30,37)
+z=random.randint(40,47)
+print('\033[1;'+str(i)+';'+str(z)+'m'+t[1]+'\033[0m')
+```
+
+开头加上`import random`就OK啦!
+
+若取消模糊识别功能(文件夹内有重复度较高的音频文件时),请修改`find()`函数的内容为:
+
+```python3
+def find(name,lrc_path,music_path):
+		lrc=os.listdir(lrc_path)
+		music=os.listdir(music_path)
+		ls=[]
+		for l in lrc:
+			if name in l:
+				ls.append(l)
+		for m in music:
+			mm=m.split('.')[0]
+			if name==mm:
+				ls.append(m)
+		ls.append(len(ls))
+		return ls
+```
