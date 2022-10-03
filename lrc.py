@@ -2,7 +2,7 @@ import time
 import os
 from threading import Thread
 
-def main(player,lrc_name,lrc_path,music_path):
+def main(player,lrc_name,lrc_path,music_path,sleep_time):
 	def get_good_name(name):
 		name=name.replace('(','\(')
 		name=name.replace(')','\)')
@@ -50,11 +50,11 @@ def main(player,lrc_name,lrc_path,music_path):
 			return list(f.read().split('\n'))
 
 	def get(tm):
-		t=tm.split('.')[0].split(':')
+		t=tm.split(':')
 		if t==['']:
 			pass
 		else:
-			return 60*int(t[0])+int(t[1])
+			return 60*int(t[0])+float(t[1])
 
 	def begin(name,w):
 		data=read(name)
@@ -62,20 +62,26 @@ def main(player,lrc_name,lrc_path,music_path):
 		for i in data:
 			tm=i.replace('[','').split(']')
 			ls.append(tm)
-		for t in ls:
-			tm=t[0]
-			me=ls.index(t)
-			if me==0:
-				needlose=0
-			else:
-				now=ls[me][0]
-				pre=ls[me-1][0]
-				if now=='':
-					pass
+		def do(ls,sleep_time):
+			for t in ls:
+				tm=t[0]
+				me=ls.index(t)
+				if me==0:
+					print(ls[0][1])
 				else:
-					time.sleep(get(now)-get(pre))
-					print(t[1])
-					##可以搞彩色的皮肤!
+					now=ls[me][0]
+					pre=ls[me-1][0]
+					if now=='':
+						pass
+					else:
+						time.sleep(get(now)-get(pre)-sleep_time)
+						print(t[1])
+						##可以搞彩色的皮肤!
+		if '00:00.00' in ls[0][0]:
+			ls=ls
+		else:
+			ls.insert(0,['00:00.000','\n不规范的歌词文件,已自动修复!'])
+		do(ls,sleep_time)
 
 	def play(player,file):
 		os.system(player+' '+file)
@@ -98,7 +104,11 @@ def main(player,lrc_name,lrc_path,music_path):
 		t2.join()
 
 '''
-main(player,name,lrc_path,music_path)
+eg: 
+
+main('cvlc --play-and-exit ','近藤真彦-夕焼けの歌','歌词/','./',0.01)
+
+main(player,lrc_name,lrc_path,music_path,sleep_time)内,
 
 player是播放器的名字,可以填cvlc或者play,注意需要末尾加空格;
 
@@ -108,5 +118,7 @@ name是待查询的文件名;
 
 lrc_path是歌词文件所在路径;
 
-music_path是音频文件所在路径.
+music_path是音频文件所在路径;
+
+sleep_time是歌词提前于时刻出现的时间长度.这个数请尽量小,因为会叠加效果;如果这个数大,说唱歌曲可能出词速度过快.
 '''
