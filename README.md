@@ -52,19 +52,25 @@
 
 这个`时间差`就是需要`sleep`的时长.
 
-再然后,用一个简单的双线程就能实现一边播放一边显示歌词啦!
+关于歌词匹配,是先寻找与歌名一模一样的歌词文件,找到的话直接使用,
+
+找不到的话,就找`歌名包含在歌词文件名内的文件`.
 
 ## 用法
+
+> 似乎python3.x版本是自带模块`mutagen`的,如果报错请输入`pip3 install mutagen`进行安装.
 
 将`lrc.py`这个文件移动到你的项目里,使用函数`lrc.main()`调用.
 
 参数:
 
-`main(player,name,lrc_path,music_path,sleep_time)`,
+`main(player,name,lrc_path,music_path,sleep_time,preview)`,
 
 其中:
 
 `player`填写播放器名称(`play `或`cvlc `或其他),**注意:需要在末尾加空格!**
+
+> 如果是使用`cvlc`,建议加上参数`cvlc --play-and-exit `,在播放后后会自动结束线程,以保证接下来程序的正常运行.
 
 `name`填写待播放的文件名或文件的部分名,**注意:不需要加后缀名!**
 
@@ -72,7 +78,11 @@
 
 同理,`music_path`是音频文件所在文件夹的路径.
 
-`sleep_time`是歌词超前于音频出现的秒数,可以精确到毫秒的十分之一.
+> 以上三个变量需要是`str`型.
+
+`sleep_time`是歌词超前于音频出现的秒数,可以精确到毫秒的十分之一,填写一个`float`或`int`
+
+`preview`是是否开启歌词预览(在下一行以灰色颜色输出下一句相差秒数和下一句歌词),填写一个`boolean`.
 
 会根据`name`自动匹配两个文件夹中的歌词和音频;如果连音频都匹配不到,则会返回`False`;
 
@@ -80,7 +90,7 @@
 
 ## 其他
 
-可以在代码第70,78行的地方修改输出样式,例如`彩虹皮肤`:
+可以在代码第52行的地方修改输出样式,例如`彩虹皮肤`:
 
 ![](https://ghproxy.com/https://raw.githubusercontent.com/wzk0/photo/main/202210021556347.png)
 
@@ -94,20 +104,21 @@ print('\033[1;'+str(i)+';'+str(z)+'m'+t[1]+'\033[0m')
 
 开头加上`import random`就OK啦!
 
-若取消模糊识别功能(文件夹内有重复度较高的音频文件时),请修改`find()`函数的内容为:
+> 预览歌词的输出在第59行.
 
-```python3
-def find(name,lrc_path,music_path):
-		lrc=os.listdir(lrc_path)
-		music=os.listdir(music_path)
-		ls=[]
-		for l in lrc:
-			if name==l:
-				ls.append(l)
-		for m in music:
-			mm=m.split('.')[0]
-			if name==mm:
-				ls.append(m)
-		ls.append(len(ls))
-		return ls
+使用到了以下模块:
+
 ```
+time
+os
+threading中的Thread
+mutagen.mp3中的MP3
+```
+
+`time`用来休眠,控制歌词滚动的时间;
+
+`os`用来获取文件夹列表,方便自动搜索;
+
+`Thread`用来实现音乐播放线程;
+
+`MP3`用来获取音频文件的实际时长,判断歌词文件是否合理.
