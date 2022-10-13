@@ -4,11 +4,6 @@ from threading import Thread
 from mutagen.mp3 import MP3
 
 def main(player,lrc_name,lrc_path,music_path,sleep_time,preview):
-	def get_good_name(name):
-		name=name.replace('(','\(')
-		name=name.replace(')','\)')
-		name=name.replace(' ','\ ')
-		return name
 		
 	def find(name,lrc_path,music_path):
 		lrc=os.listdir(lrc_path)
@@ -108,14 +103,14 @@ def main(player,lrc_name,lrc_path,music_path,sleep_time,preview):
 	if result[-1]==1:
 		music_name=result[0]
 		print('\n\033[1;36m没有找到歌词!\n\033[0m')
-		MP3(music_path+get_good_name(music_name)).info.length
-		pla(player,music_path+get_good_name(music_name))
+		MP3(music_path+music_name).info.length
+		pla(player,music_path+music_name)
 	if result[-1]==2:
 		music_name=result[1]
 		lrc_name=result[0]
-		ttt=Thread(target=pla,args=(player,music_path+get_good_name(music_name)))
+		ttt=Thread(target=pla,args=(player,music_path+music_name))
 		ttt.daemon=True
-		length=MP3(music_path+get_good_name(music_name)).info.length
+		length=MP3(music_path+music_name).info.length
 		res=analysis(lrc_path+lrc_name,ttt)
 		if get_at(res)>length:
 			print('\033[1;36m此歌词文件中写明的时长与歌曲实际时长不符,请将此歌曲文件\033[1;32m'+lrc_path+lrc_name+'\033[0m\033[1;36m的最后一行进行修改后再重新播放.已自动跳过该首歌!\n\033[0m')
@@ -123,10 +118,12 @@ def main(player,lrc_name,lrc_path,music_path,sleep_time,preview):
 		else:
 			show(res,ttt,sleep_time,preview)
 
+main('cvlc --play-and-exit ','大風吹 Simon Says','歌词/','./',0,True)
+
 '''
 eg: 
 
-main('cvlc --play-and-exit ','近藤真彦-夕焼けの歌','歌词/','./',0,True)
+main('cvlc --play-and-exit ','大風吹 Simon Says','歌词/','./',0,True)
 
 =========================================================
 
